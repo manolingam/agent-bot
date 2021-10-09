@@ -45,15 +45,15 @@ module.exports = {
             );
             return;
           }
-          // if (user.id === message.author.id) {
-          //   reaction.users.remove(user.id);
-          //   sendWarnMessage(
-          //     client,
-          //     message,
-          //     `Cannot ⭐ yourself <@${user.id}>`
-          //   );
-          //   return;
-          // }
+          if (user.id === message.author.id) {
+            reaction.users.remove(user.id);
+            sendWarnMessage(
+              client,
+              message,
+              `Cannot ⭐ yourself <@${user.id}>`
+            );
+            return;
+          }
         }
 
         // get reacted user ids
@@ -63,7 +63,7 @@ module.exports = {
           reacted_users = reacted_users + `<@${user.id}> `;
         });
 
-        if (reaction.count === STARS_THRESHOLD) {
+        if (reaction.count === parseInt(STARS_THRESHOLD)) {
           // the-wire channel ---------------------------------------------------
           if (message.channel.id === CHANNEL_1) {
             let msg = new MessageEmbed()
