@@ -1,4 +1,5 @@
 const { MessageEmbed } = require('discord.js');
+const axios = require('axios').default;
 
 const { SECRETS, STARS_THRESHOLD } = require('../config');
 
@@ -6,6 +7,7 @@ const CHANNEL_1 = SECRETS.CHANNEL_1;
 const CHANNEL_2 = SECRETS.CHANNEL_2;
 const CHANNEL_3 = SECRETS.CHANNEL_3;
 const CHANNEL_4 = SECRETS.CHANNEL_4;
+const IFTTT_ENDPOINT = SECRETS.IFTTT_ENDPOINT;
 
 const sendWarnMessage = (_client, _message, _content) => {
   _client.channels.cache
@@ -42,15 +44,15 @@ module.exports = {
             );
             return;
           }
-          if (user.id === message.author.id) {
-            reaction.users.remove(user.id);
-            sendWarnMessage(
-              client,
-              message,
-              `Cannot ⭐ yourself <@${user.id}>`
-            );
-            return;
-          }
+          // if (user.id === message.author.id) {
+          //   reaction.users.remove(user.id);
+          //   sendWarnMessage(
+          //     client,
+          //     message,
+          //     `Cannot ⭐ yourself <@${user.id}>`
+          //   );
+          //   return;
+          // }
         }
 
         // get reacted user ids
@@ -125,15 +127,26 @@ module.exports = {
 
           // fusion channel -------------------------------------------------------
           if (message.channel.id === CHANNEL_3) {
-            let msg = new MessageEmbed()
-              .setColor('#fcba03')
-              .setAuthor(message.author.username, message.author.avatarURL())
-              .addFields(
-                { name: 'Tweeted!', value: message.embeds[0].fields[0].value },
-                { name: 'Jump to message', value: message.url }
-              );
+            try {
+              await axios.post(IFTTT_ENDPOINT, {
+                value1: message.embeds[0].fields[0].value
+              });
 
-            client.channels.cache.get(CHANNEL_4).send({ embeds: [msg] });
+              let msg = new MessageEmbed()
+                .setColor('#fcba03')
+                .setAuthor(message.author.username, message.author.avatarURL())
+                .addFields(
+                  {
+                    name: 'Tweeted!',
+                    value: message.embeds[0].fields[0].value
+                  },
+                  { name: 'Jump to message', value: message.url }
+                );
+
+              client.channels.cache.get(CHANNEL_4).send({ embeds: [msg] });
+            } catch (err) {
+              console.log(err);
+            }
           }
         }
       } catch (err) {
