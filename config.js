@@ -7,9 +7,8 @@ const SECRETS = {
   CHANNEL_2: process.env.CHANNEL_2,
   CHANNEL_3: process.env.CHANNEL_3,
   CHANNEL_4: process.env.CHANNEL_4,
-  IFTTT_ENDPOINT: process.env.IFTTT_ENDPOINT
+  IFTTT_ENDPOINT: process.env.IFTTT_ENDPOINT,
+  STARS_THRESHOLD: process.env.STARS_THRESHOLD
 };
 
-const STARS_THRESHOLD = 3;
-
-module.exports = { SECRETS, STARS_THRESHOLD };
+module.exports = { SECRETS };

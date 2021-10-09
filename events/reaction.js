@@ -1,13 +1,14 @@
 const { MessageEmbed } = require('discord.js');
 const axios = require('axios').default;
 
-const { SECRETS, STARS_THRESHOLD } = require('../config');
+const { SECRETS } = require('../config');
 
 const CHANNEL_1 = SECRETS.CHANNEL_1;
 const CHANNEL_2 = SECRETS.CHANNEL_2;
 const CHANNEL_3 = SECRETS.CHANNEL_3;
 const CHANNEL_4 = SECRETS.CHANNEL_4;
 const IFTTT_ENDPOINT = SECRETS.IFTTT_ENDPOINT;
+const STARS_THRESHOLD = SECRETS.STARS_THRESHOLD;
 
 const sendWarnMessage = (_client, _message, _content) => {
   _client.channels.cache
