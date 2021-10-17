@@ -94,7 +94,8 @@ module.exports = {
                 { name: 'Proposed tweet', value: message.content },
                 { name: 'Starred by', value: reacted_users },
                 { name: 'Jump to author message', value: message.url }
-              );
+              )
+              .setFooter('You cannot unreact once reacted. So react wisely! ');
 
             client.channels.cache.get(CHANNEL_3).send({ embeds: [msg] });
             // let replied_message = await message.channel.messages.fetch(
@@ -141,10 +142,11 @@ module.exports = {
                     name: 'Tweeted!',
                     value: message.embeds[0].fields[0].value
                   },
-                  { name: 'Jump to message', value: message.url }
+                  { name: 'Starred by', value: reacted_users }
                 );
 
               client.channels.cache.get(CHANNEL_4).send({ embeds: [msg] });
+              message.delete();
             } catch (err) {
               console.log(err);
             }
