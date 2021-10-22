@@ -3,10 +3,9 @@ require('dotenv').config();
 const SECRETS = {
   BOT_TOKEN: process.env.BOT_TOKEN,
   BOT_ID: process.env.BOT_ID,
-  CHANNEL_1: process.env.CHANNEL_1,
-  CHANNEL_2: process.env.CHANNEL_2,
-  CHANNEL_3: process.env.CHANNEL_3,
-  CHANNEL_4: process.env.CHANNEL_4,
+  COLLECTION_CHANNEL: process.env.COLLECTION_CHANNEL,
+  FUSION_CHANNEL: process.env.FUSION_CHANNEL,
+  DISTRIBUTION_CHANNEL: process.env.DISTRIBUTION_CHANNEL,
   IFTTT_ENDPOINT: process.env.IFTTT_ENDPOINT,
   STARS_THRESHOLD: process.env.STARS_THRESHOLD
 };

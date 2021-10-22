@@ -3,10 +3,9 @@ const axios = require('axios').default;
 
 const { SECRETS } = require('../config');
 
-const CHANNEL_1 = SECRETS.CHANNEL_1;
-const CHANNEL_2 = SECRETS.CHANNEL_2;
-const CHANNEL_3 = SECRETS.CHANNEL_3;
-const CHANNEL_4 = SECRETS.CHANNEL_4;
+const COLLECTION_CHANNEL = SECRETS.COLLECTION_CHANNEL;
+const FUSION_CHANNEL = SECRETS.FUSION_CHANNEL;
+const DISTRIBUTION_CHANNEL = SECRETS.DISTRIBUTION_CHANNEL;
 const IFTTT_ENDPOINT = SECRETS.IFTTT_ENDPOINT;
 const STARS_THRESHOLD = SECRETS.STARS_THRESHOLD;
 
@@ -32,9 +31,8 @@ module.exports = {
 
         // preflight checks
         if (
-          message.channel.id === CHANNEL_1 ||
-          message.channel.id === CHANNEL_2 ||
-          message.channel.id === CHANNEL_3
+          message.channel.id === COLLECTION_CHANNEL ||
+          message.channel.id === FUSION_CHANNEL
         ) {
           if (reaction.emoji.name !== '⭐') {
             reaction.users.remove(user.id);
@@ -45,15 +43,15 @@ module.exports = {
             );
             return;
           }
-          if (user.id === message.author.id) {
-            reaction.users.remove(user.id);
-            sendWarnMessage(
-              client,
-              message,
-              `Cannot ⭐ yourself <@${user.id}>`
-            );
-            return;
-          }
+          // if (user.id === message.author.id) {
+          //   reaction.users.remove(user.id);
+          //   sendWarnMessage(
+          //     client,
+          //     message,
+          //     `Cannot ⭐ yourself <@${user.id}>`
+          //   );
+          //   return;
+          // }
         }
 
         // get reacted user ids
@@ -64,8 +62,8 @@ module.exports = {
         });
 
         if (reaction.count === parseInt(STARS_THRESHOLD)) {
-          // the-wire channel ---------------------------------------------------
-          if (message.channel.id === CHANNEL_1) {
+          // collection channel ---------------------------------------------------
+          if (message.channel.id === COLLECTION_CHANNEL) {
             let msg = new MessageEmbed()
               .setColor('#fcba03')
               .setAuthor(message.author.username, message.author.avatarURL())
@@ -73,37 +71,51 @@ module.exports = {
                 { name: '3 star content', value: message.content },
                 { name: 'Starred by', value: reacted_users },
                 { name: 'Jump to author message', value: message.url }
-              );
+              )
+              .setFooter('You cannot unreact once reacted. So react wisely! ');
 
-            client.channels.cache.get(CHANNEL_2).send({
+            client.channels.cache.get(FUSION_CHANNEL).send({
               content: `<@${message.author.id}>, your message is promoted! Anyone can now reply to this message & start composing possible tweets.`,
               embeds: [msg]
             });
           }
 
-          // collection channel --------------------------------------------------
+          // Fusion channel --------------------------------------------------
           if (
-            message.channel.id === CHANNEL_2 &&
+            message.channel.id === FUSION_CHANNEL &&
             message.type === 'REPLY' &&
             message.mentions.repliedUser.id === SECRETS.BOT_ID
           ) {
-            let msg = new MessageEmbed()
-              .setColor('#fcba03')
-              .setAuthor(message.author.username, message.author.avatarURL())
-              .addFields(
-                { name: 'Proposed tweet', value: message.content },
-                { name: 'Starred by', value: reacted_users },
-                { name: 'Jump to author message', value: message.url }
-              )
-              .setFooter('You cannot unreact once reacted. So react wisely! ');
+            // let msg = new MessageEmbed()
+            //   .setColor('#fcba03')
+            //   .setAuthor(message.author.username, message.author.avatarURL())
+            //   .addFields(
+            //     {
+            //       name: 'Tweeted Content',
+            //       value: message.content
+            //     },
+            //     { name: 'Starred by', value: reacted_users }
+            //   )
+            //   .setFooter('Link to posted tweet is asynchronous. Wait');
 
-            client.channels.cache.get(CHANNEL_3).send({ embeds: [msg] });
-            // let replied_message = await message.channel.messages.fetch(
-            //   message.reference.messageId
-            // );
-            // replied_message.delete();
+            try {
+              await axios.post(IFTTT_ENDPOINT, {
+                value1: message.content + ' #DIA'
+              });
+
+              // client.channels.cache
+              //   .get(DISTRIBUTION_CHANNEL)
+              //   .send({ embeds: [msg] });
+
+              let replied_message = await message.channel.messages.fetch(
+                message.reference.messageId
+              );
+              replied_message.delete();
+            } catch (err) {
+              console.log(err);
+            }
           } else if (
-            message.channel.id === CHANNEL_2 &&
+            message.channel.id === FUSION_CHANNEL &&
             message.type === 'REPLY' &&
             message.mentions.repliedUser.id !== SECRETS.BOT_ID
           ) {
@@ -115,7 +127,7 @@ module.exports = {
             );
             return;
           } else if (
-            message.channel.id === CHANNEL_2 &&
+            message.channel.id === FUSION_CHANNEL &&
             message.type !== 'REPLY'
           ) {
             reaction.users.remove(user.id);
@@ -125,31 +137,6 @@ module.exports = {
               `You can only emojify a reply that's given to the agent bot <@${user.id}>`
             );
             return;
-          }
-
-          // fusion channel -------------------------------------------------------
-          if (message.channel.id === CHANNEL_3) {
-            try {
-              await axios.post(IFTTT_ENDPOINT, {
-                value1: message.embeds[0].fields[0].value
-              });
-
-              let msg = new MessageEmbed()
-                .setColor('#fcba03')
-                .setAuthor(message.author.username, message.author.avatarURL())
-                .addFields(
-                  {
-                    name: 'Tweeted!',
-                    value: message.embeds[0].fields[0].value
-                  },
-                  { name: 'Starred by', value: reacted_users }
-                );
-
-              client.channels.cache.get(CHANNEL_4).send({ embeds: [msg] });
-              message.delete();
-            } catch (err) {
-              console.log(err);
-            }
           }
         }
       } catch (err) {
