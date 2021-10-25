@@ -43,15 +43,15 @@ module.exports = {
             );
             return;
           }
-          // if (user.id === message.author.id) {
-          //   reaction.users.remove(user.id);
-          //   sendWarnMessage(
-          //     client,
-          //     message,
-          //     `Cannot ⭐ yourself <@${user.id}>`
-          //   );
-          //   return;
-          // }
+          if (user.id === message.author.id) {
+            reaction.users.remove(user.id);
+            sendWarnMessage(
+              client,
+              message,
+              `Cannot ⭐ yourself <@${user.id}>`
+            );
+            return;
+          }
         }
 
         // get reacted user ids
@@ -100,7 +100,7 @@ module.exports = {
 
             try {
               await axios.post(IFTTT_ENDPOINT, {
-                value1: message.content + ' #DIA'
+                value1: message.content + ' #daointel'
               });
 
               // client.channels.cache
